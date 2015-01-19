@@ -6,7 +6,8 @@ function [cell,j]=gettreeparams(tree,cell,d,i,j)
 if i ~= 0
     %
     i=num2str(i);
-    d=strcat(d,'.kids{1,',i,'}');
+    %d=strcat(d,'.kids{1,',i,'}');
+    d=[d '.kids{1,' num2str(i) '}'];
 end
 if isfield (tree,'param')
     if ~isempty(tree.param)
