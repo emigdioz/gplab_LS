@@ -30,12 +30,13 @@ global strEval;
 global span_interval;
 global optimum_classifier_th;
 global type_function;
-clf;
+
 
 original_fitness = pop(index).fitness; % Record original fitness
 
 AUC_full = false; % Compute full AUC or partial
 verbose = false; % Print partial results
+plot_calculations = false; % Plot partial calculations
 
 strEval = pop(index).str;
 if strcmp(type,'classification')
@@ -143,21 +144,24 @@ if type_function==2 % Classification stage
       ACC1 = (TP + TN)/(TP + TN + FP + FN);
    end
    
-   % Plot ROC before optimization
-   subplot(3,2,1);
-   plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
-   xlabel('FP');
-   ylabel('TP');
-   title('ROC (before LS)');
-   hold on;
-   plot(FPv2(I_optimum_classifier),TPv2(I_optimum_classifier),'bx');
-   axis square;
-   subplot(3,2,2);
-   plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
-   xlabel('FN');
-   ylabel('TN');
-   title('ROC');
-   axis square;
+   if plot_calculations
+      clf;
+      % Plot ROC before optimization
+      subplot(3,2,1);
+      plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
+      xlabel('FP');
+      ylabel('TP');
+      title('ROC (before LS)');
+      hold on;
+      plot(FPv2(I_optimum_classifier),TPv2(I_optimum_classifier),'bx');
+      axis square;
+      subplot(3,2,2);
+      plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
+      xlabel('FN');
+      ylabel('TN');
+      title('ROC');
+      axis square;
+   end
    
    xdata = data.example;
    ydata = data.result;
@@ -175,23 +179,25 @@ if type_function==2 % Classification stage
       span_interval/nsamples:(optimum_classifier_th + max(dist_from_th)); % Fine sampling
    sig_f = 1./(1+exp((15./span_interval).*(res-optimum_classifier_th)));
    sig_ideal = 1./(1+exp((15./span_interval).*(sampling-optimum_classifier_th)));
-
-   % Plot before optimization
-   subplot(3,2,5);
-   plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
-   hold on;
-   plot(res(data.result==2),sig_f(data.result==2),'.','color',([214 39 40]./255)); % Class 2
-   hold on;
-   plot(res(data.result==1),sig_f(data.result==1),'.','color',([31 119 180]./255)); % Class 1
-   legend('Sig function','Class 2','Class 1');
-   hold on;
-   line([optimum_classifier_th optimum_classifier_th],[0 1],...
-        'color',([255 127 14]./255),'LineWidth',2);
-   hold on;
-   plot(res(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
-   hold on;
-   plot(res(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1     
-   title('Before optimization...');
+   
+   if plot_calculations
+      % Plot before optimization
+      subplot(3,2,5);
+      plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
+      hold on;
+      plot(res(data.result==2),sig_f(data.result==2),'.','color',([214 39 40]./255)); % Class 2
+      hold on;
+      plot(res(data.result==1),sig_f(data.result==1),'.','color',([31 119 180]./255)); % Class 1
+      legend('Sig function','Class 2','Class 1');
+      hold on;
+      line([optimum_classifier_th optimum_classifier_th],[0 1],...
+           'color',([255 127 14]./255),'LineWidth',2);
+      hold on;
+      plot(res(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
+      hold on;
+      plot(res(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1     
+      title('Before optimization...');
+   end
 end
 % Important! save optimum_classifier_th & span_interval to reuse in fitness
 % function after individual has been optimized
@@ -213,7 +219,7 @@ for k=1:nparams(2)
 end
 
 niter = params.LSniter;
-niter = 1000;
+%niter = 1000;
 options = optimset('Display','off','MaxIter',niter);
 
 %lb = [-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000];
@@ -236,13 +242,13 @@ try
    individual_m = calcfitness(temp_ind,params,data,state,0); 
 
    if(individual_m.fitness == original_fitness)
-      fprintf('Fitness after optimization same as before. Not doing anything...\n');
+      fprintf('=');
    end
    if(individual_m.fitness > original_fitness)
-      fprintf('Optimization did not improve fitness. Discarding...\n'); % In case ACC is bigger
+      fprintf('-'); % In case ACC is bigger
    end
    if(individual_m.fitness < original_fitness)
-      fprintf('Optimization improved fitness.....................................\n');
+      fprintf('+');
       pop(index).fitness = individual_m.fitness;
       pop(index).adjustedfitness = individual_m.adjustedfitness;
       pop(index).result = individual_m.result;
@@ -308,36 +314,38 @@ try
       %fprintf(['Internal fitness: ' num2str(1-ACC2) '\n']);
       % Update fitness
       %pop(index).fitness = 1 - ACC2;
-
-      % Plot after optimization
-      subplot(3,2,6);
-      plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
-      hold on;
-      plot(pop(index).result(data.result==2),sig_f_opt(data.result==2),'.','color',([214 39 40]./255)); % Class 2
-      hold on;
-      plot(pop(index).result(data.result==1),sig_f_opt(data.result==1),'.','color',([31 119 180]./255)); % Class 1
-      legend('Sig function','Class 2','Class 1');
-      hold on;
-      line([optimum_classifier_th optimum_classifier_th],[0 1],...
-           'color',([255 127 14]./255),'LineWidth',2);
-      hold on;   
-      plot(pop(index).result(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
-      hold on;
-      plot(pop(index).result(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1          
-      title('After optimization...'); 
-      subplot(3,2,3);
-      plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
-      xlabel('FP');
-      ylabel('TP');
-      title('ROC (after LS)');
-      axis square;
-      subplot(3,2,4);
-      plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
-      xlabel('FN');
-      ylabel('TN');
-      title('ROC');
-      axis square;
-      drawnow;
+      
+      if plot_calculations
+         % Plot after optimization
+         subplot(3,2,6);
+         plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
+         hold on;
+         plot(pop(index).result(data.result==2),sig_f_opt(data.result==2),'.','color',([214 39 40]./255)); % Class 2
+         hold on;
+         plot(pop(index).result(data.result==1),sig_f_opt(data.result==1),'.','color',([31 119 180]./255)); % Class 1
+         legend('Sig function','Class 2','Class 1');
+         hold on;
+         line([optimum_classifier_th optimum_classifier_th],[0 1],...
+              'color',([255 127 14]./255),'LineWidth',2);
+         hold on;   
+         plot(pop(index).result(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
+         hold on;
+         plot(pop(index).result(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1          
+         title('After optimization...'); 
+         subplot(3,2,3);
+         plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
+         xlabel('FP');
+         ylabel('TP');
+         title('ROC (after LS)');
+         axis square;
+         subplot(3,2,4);
+         plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
+         xlabel('FN');
+         ylabel('TN');
+         title('ROC');
+         axis square;
+         drawnow;
+      end
       if verbose
          fprintf('--------------------------------------------------------\n');
          if AUC_full
@@ -353,8 +361,6 @@ try
          fprintf(['TP after optimization = ' num2str(TP_opt) '/' num2str(sum(data.result == 1)) '\n']); 
          fprintf(['TN before optimization = ' num2str(TN) '/' num2str(sum(data.result == 2)) '\n']); 
          fprintf(['TN after optimization = ' num2str(TN_opt) '/' num2str(sum(data.result == 2)) '\n']);       
-      else
-         fprintf('.');
       end
    end
 %    if params.usetestdata
