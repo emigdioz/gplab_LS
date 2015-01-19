@@ -243,7 +243,7 @@ if params.useLS
          end
       end
    end
-   fprintf('/    Finished LS on %d individuals\n',ind_counter);
+   fprintf('\n/    Finished LS on %d individuals\n',ind_counter);
    %state.bestsofar = pop(bestindex);
 end
 
