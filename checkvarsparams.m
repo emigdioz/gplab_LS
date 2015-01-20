@@ -280,6 +280,18 @@ if start
       params.LSprob = 1;
    end
 
+   if(isfield(params,'stop_by_funceval')==0)
+      params.stop_by_funceval = 0;
+   end
+
+   if(isfield(params,'funceval_limit')==0)
+      params.funceval_limit = 1000000;
+   end
+
+   if(isfield(params,'funceval_nsamples')==0)
+      params.funceval_nsamples = 100;
+   end
+   
 end % if start
 
 if continuing
