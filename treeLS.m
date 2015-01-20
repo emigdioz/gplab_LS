@@ -261,6 +261,7 @@ try
       pop(index).adjustedfitness = individual_m.adjustedfitness;
       pop(index).result = individual_m.result;
       pop(index).tree = temp_ind.tree;
+      pop(index).parameters = temp_ind.parameters;
       
       if type_function==2 % Classification stage
          sig_f_opt = 1./(1+exp((15./span_interval).*(pop(index).result-optimum_classifier_th)));
