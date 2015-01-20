@@ -155,8 +155,6 @@ end
 
 sc=0;
 
-
-
 %%% datos de la generacion cero para medir Bloat
 program_size_0=vars.state.avgnodeshistory;
 avg_fitness_0=vars.state.avgfitness;
@@ -203,20 +201,22 @@ for i=ginic:gend
    
    
    % Calcular overfitting
-   test_fit(i)=vars.state.bestsofar.testfitness;
-   training_fit(i)=vars.state.bestsofar.fitness;
-       
-   
-   if training_fit(i) > test_fit(i)
-       overfit(i)=0;
-   else
-       if test_fit(i) < btp
-           overfit(i)=0;
-           btp=test_fit(i);
-           tbtp=training_fit(i);
-       else
-           overfit(i)=abs(training_fit(i) - test_fit(i)) - abs(tbtp-btp);
-       end
+   if vars.params.usetestdata
+      test_fit(i)=vars.state.bestsofar.testfitness;
+      training_fit(i)=vars.state.bestsofar.fitness;
+
+
+      if training_fit(i) > test_fit(i)
+          overfit(i)=0;
+      else
+          if test_fit(i) < btp
+              overfit(i)=0;
+              btp=test_fit(i);
+              tbtp=training_fit(i);
+          else
+              overfit(i)=abs(training_fit(i) - test_fit(i)) - abs(tbtp-btp);
+          end
+      end
    end
    
    
