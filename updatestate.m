@@ -141,7 +141,7 @@ if params.useLS
                pop(bestindex)=addsymtree(params,pop(bestindex));
            end
        end
-      [state,pop] = treeLS(params,state,data,pop,bestindex,'classification');
+      [state,pop] = treeLS(params,state,data,pop,bestindex,params.LStype);
       state.bestsofar = pop(bestindex);
       ind_counter = ind_counter + 1;
    elseif params.LSworst
@@ -166,7 +166,7 @@ if params.useLS
                   end
                end
                if (min(pop(i).result) ~= max(pop(i).result))
-                  [state,pop] = treeLS(params,state,data,pop,i,'classification');
+                  [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
                %[state,pop] = applyLS(params,state,data,pop,i);
                   ind_counter = ind_counter + 1;
                end
@@ -181,7 +181,7 @@ if params.useLS
                      end
                   end
                   if (min(pop(i).result) ~= max(pop(i).result))
-                     [state,pop] = treeLS(params,state,data,pop,i,'classification');
+                     [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
                      %[state,pop] = applyLS(params,state,data,pop,i);
                      ind_counter = ind_counter + 1;
                   end
@@ -202,7 +202,7 @@ if params.useLS
                         pop(i)=addsymtree(params,pop(i));
                      end
                   end
-                  [state,pop] = applyLS(params,state,data,pop,i);
+                  [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
                   ind_counter = ind_counter + 1;
                end
             end
@@ -210,7 +210,7 @@ if params.useLS
             for i = state.popsize:(state.popsize - subpopsize)
                seed_n = rand(1,1);
                if seed_n <= params.LSprob
-                  [state,pop] = applyLS(params,state,data,pop,i);
+                  [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
                   ind_counter = ind_counter + 1;
                end
             end
