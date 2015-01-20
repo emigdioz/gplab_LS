@@ -44,9 +44,11 @@ plot_calculations = false; % Plot partial calculations
 strEval = pop(index).str;
 if strcmp(type,'classification')
    type_function = 2;
-end
-if strcmp(type,'regression')
+elseif strcmp(type,'regression')
    type_function = 1;
+else
+   fprintf('Unknown method for LS calculation. Aborting individual\n');
+   return;
 end
 
 if type_function==2 % Classification stage
@@ -202,6 +204,9 @@ if type_function==2 % Classification stage
       title('Before optimization...');
    end
 end
+if type_function==1 % Regression stage
+   target_v = data.result;   
+end
 % Important! save optimum_classifier_th & span_interval to reuse in fitness
 % function after individual has been optimized
 pop(index).optimum_classifier_th = optimum_classifier_th;
@@ -256,120 +261,123 @@ try
       pop(index).adjustedfitness = individual_m.adjustedfitness;
       pop(index).result = individual_m.result;
       pop(index).tree = temp_ind.tree;
-
-      sig_f_opt = 1./(1+exp((15./span_interval).*(pop(index).result-optimum_classifier_th)));
-
-      if AUC_full
-         % Calculate again ROC and AUCf
-         out_exp = pop(index).result;
-         sorted_data = sort(pop(index).result);  % sorted evaluated tree
-         for i = 1:s_data
-            predicted_v = zeros(length(pop(index).result),1); % Clear vector
-            predicted_v(out_exp<sorted_data(i)) = 2;  % All values less or equal than threshold assign Class 2
-            predicted_v(out_exp>=sorted_data(i)) = 1;   % All values greater than threshold assign Class 1  
-            % Calculate current TP & FP
-            TP_new = predicted_v(data.result == 1);
-            TPv(i) = length(TP_new(TP_new == 1))/length(TP_new); % Normalize
-            FP_new = predicted_v(data.result == 2);
-            FPv(i) = length(FP_new(FP_new == 1))/length(FP_new); % Normalize
-            TN_new = predicted_v(data.result == 2);
-            TNv(i) = length(TN_new(TN_new == 2))/length(TN_new); % Normalize
-            FN_new = predicted_v(data.result == 1);
-            FNv(i) = length(FN_new(FN_new == 2))/length(FN_new); % Normalize            
-         end
-         [FPv2,I] = sort(FPv);
-         TPv2 = TPv(I);
-         % Calculate also negative class
-         [FNv2,I] = sort(FNv);
-         TNv2 = TNv(I);
-
-         AUCf_opt = sum(0.5.*(FPv2(2:s_data) - FPv2(1:(s_data-1))).*(TPv2(2:s_data) + TPv2(1:(s_data-1))));
-         AUCf_opt_neg = sum(0.5.*(FNv2(2:s_data) - FNv2(1:(s_data-1))).*(TNv2(2:s_data) + TNv2(1:(s_data-1))));
-      else
-         for i = 1:(nsamples+1)
-            predicted_v = zeros(length(res),1); % Clear vector
-            predicted_v(res<sampling(i)) = 2;  % All values less or equal than threshold assign Class 2
-            predicted_v(res>=sampling(i)) = 1;   % All values greater than threshold assign Class 1  
-            % Calculate current TP & FP
-            TP_new = predicted_v(data.result == 1);
-            TPv(i) = length(TP_new(TP_new == 1))/length(TP_new); % Normalize
-            FP_new = predicted_v(data.result == 2);
-            FPv(i) = length(FP_new(FP_new == 1))/length(FP_new); % Normalize
-         end
-         [FPv2,I] = sort(FPv);
-         TPv2 = TPv(I);
-         AUCp_opt = sum(0.5.*(FPv2(2:nsamples+1) - FPv2(1:nsamples)).*(TPv2(2:nsamples+1) + TPv2(1:nsamples)));
-      end
-      % Calculate ACC after optimization
-      predicted_v_opt = zeros(length(res),1); % Clear vector
-      predicted_v_opt(sig_f_opt<0.5) = 1;  
-      predicted_v_opt(sig_f_opt>=0.5) = 2;
-      TP_opt = predicted_v_opt(data.result == 1);
-      TP_opt = length(TP_opt(TP_opt == 1));
-      FP_opt = predicted_v_opt(data.result == 2);
-      FP_opt = length(FP_opt(FP_opt == 1));
-      FN_opt = predicted_v_opt(data.result == 1);
-      FN_opt = length(FN_opt(FN_opt == 2));
-      TN_opt = predicted_v_opt(data.result == 2);
-      TN_opt = length(TN_opt(TN_opt == 2));
-
-      ACC2 = (TP_opt + TN_opt)/(TP_opt + TN_opt + FP_opt + FN_opt);
-      %fprintf(['Internal fitness: ' num2str(1-ACC2) '\n']);
-      % Update fitness
-      %pop(index).fitness = 1 - ACC2;
       
-      if plot_calculations
-         % Plot after optimization
-         subplot(3,2,6);
-         plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
-         hold on;
-         plot(pop(index).result(data.result==2),sig_f_opt(data.result==2),'.','color',([214 39 40]./255)); % Class 2
-         hold on;
-         plot(pop(index).result(data.result==1),sig_f_opt(data.result==1),'.','color',([31 119 180]./255)); % Class 1
-         legend('Sig function','Class 2','Class 1');
-         hold on;
-         line([optimum_classifier_th optimum_classifier_th],[0 1],...
-              'color',([255 127 14]./255),'LineWidth',2);
-         hold on;   
-         plot(pop(index).result(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
-         hold on;
-         plot(pop(index).result(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1          
-         title('After optimization...'); 
-         subplot(3,2,3);
-         plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
-         xlabel('FP');
-         ylabel('TP');
-         title('ROC (after LS)');
-         axis square;
-         subplot(3,2,4);
-         plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
-         xlabel('FN');
-         ylabel('TN');
-         title('ROC');
-         axis square;
-         drawnow;
-      end
-      if verbose
-         fprintf('--------------------------------------------------------\n');
+      if type_function==2 % Classification stage
+         sig_f_opt = 1./(1+exp((15./span_interval).*(pop(index).result-optimum_classifier_th)));
+
          if AUC_full
-            fprintf(['AUCf before optimization = ' num2str(AUCf_ori) '\n']);      
-            fprintf(['AUCf after optimization = ' num2str(AUCf_opt) '\n']);      
+            % Calculate again ROC and AUCf
+            out_exp = pop(index).result;
+            sorted_data = sort(pop(index).result);  % sorted evaluated tree
+            for i = 1:s_data
+               predicted_v = zeros(length(pop(index).result),1); % Clear vector
+               predicted_v(out_exp<sorted_data(i)) = 2;  % All values less or equal than threshold assign Class 2
+               predicted_v(out_exp>=sorted_data(i)) = 1;   % All values greater than threshold assign Class 1  
+               % Calculate current TP & FP
+               TP_new = predicted_v(data.result == 1);
+               TPv(i) = length(TP_new(TP_new == 1))/length(TP_new); % Normalize
+               FP_new = predicted_v(data.result == 2);
+               FPv(i) = length(FP_new(FP_new == 1))/length(FP_new); % Normalize
+               TN_new = predicted_v(data.result == 2);
+               TNv(i) = length(TN_new(TN_new == 2))/length(TN_new); % Normalize
+               FN_new = predicted_v(data.result == 1);
+               FNv(i) = length(FN_new(FN_new == 2))/length(FN_new); % Normalize            
+            end
+            [FPv2,I] = sort(FPv);
+            TPv2 = TPv(I);
+            % Calculate also negative class
+            [FNv2,I] = sort(FNv);
+            TNv2 = TNv(I);
+
+            AUCf_opt = sum(0.5.*(FPv2(2:s_data) - FPv2(1:(s_data-1))).*(TPv2(2:s_data) + TPv2(1:(s_data-1))));
+            AUCf_opt_neg = sum(0.5.*(FNv2(2:s_data) - FNv2(1:(s_data-1))).*(TNv2(2:s_data) + TNv2(1:(s_data-1))));
          else
-            fprintf(['AUCp before optimization = ' num2str(AUCp_ori) '\n']);      
-            fprintf(['AUCp after optimization = ' num2str(AUCp_opt) '\n']);      
+            for i = 1:(nsamples+1)
+               predicted_v = zeros(length(res),1); % Clear vector
+               predicted_v(res<sampling(i)) = 2;  % All values less or equal than threshold assign Class 2
+               predicted_v(res>=sampling(i)) = 1;   % All values greater than threshold assign Class 1  
+               % Calculate current TP & FP
+               TP_new = predicted_v(data.result == 1);
+               TPv(i) = length(TP_new(TP_new == 1))/length(TP_new); % Normalize
+               FP_new = predicted_v(data.result == 2);
+               FPv(i) = length(FP_new(FP_new == 1))/length(FP_new); % Normalize
+            end
+            [FPv2,I] = sort(FPv);
+            TPv2 = TPv(I);
+            AUCp_opt = sum(0.5.*(FPv2(2:nsamples+1) - FPv2(1:nsamples)).*(TPv2(2:nsamples+1) + TPv2(1:nsamples)));
          end
-         fprintf(['ACC before optimization = ' num2str(ACC1) '\n']);
-         fprintf(['ACC after optimization = ' num2str(ACC2) '\n']); 
-         fprintf(['TP before optimization = ' num2str(TP) '/' num2str(sum(data.result == 1)) '\n']); 
-         fprintf(['TP after optimization = ' num2str(TP_opt) '/' num2str(sum(data.result == 1)) '\n']); 
-         fprintf(['TN before optimization = ' num2str(TN) '/' num2str(sum(data.result == 2)) '\n']); 
-         fprintf(['TN after optimization = ' num2str(TN_opt) '/' num2str(sum(data.result == 2)) '\n']);       
+         % Calculate ACC after optimization
+         predicted_v_opt = zeros(length(res),1); % Clear vector
+         predicted_v_opt(sig_f_opt<0.5) = 1;  
+         predicted_v_opt(sig_f_opt>=0.5) = 2;
+         TP_opt = predicted_v_opt(data.result == 1);
+         TP_opt = length(TP_opt(TP_opt == 1));
+         FP_opt = predicted_v_opt(data.result == 2);
+         FP_opt = length(FP_opt(FP_opt == 1));
+         FN_opt = predicted_v_opt(data.result == 1);
+         FN_opt = length(FN_opt(FN_opt == 2));
+         TN_opt = predicted_v_opt(data.result == 2);
+         TN_opt = length(TN_opt(TN_opt == 2));
+
+         ACC2 = (TP_opt + TN_opt)/(TP_opt + TN_opt + FP_opt + FN_opt);
+         %fprintf(['Internal fitness: ' num2str(1-ACC2) '\n']);
+         % Update fitness
+         %pop(index).fitness = 1 - ACC2;
+
+         if plot_calculations
+            % Plot after optimization
+            subplot(3,2,6);
+            plot(sampling,sig_ideal,'color',([230 230 230]./255),'linewidth',4);
+            hold on;
+            plot(pop(index).result(data.result==2),sig_f_opt(data.result==2),'.','color',([214 39 40]./255)); % Class 2
+            hold on;
+            plot(pop(index).result(data.result==1),sig_f_opt(data.result==1),'.','color',([31 119 180]./255)); % Class 1
+            legend('Sig function','Class 2','Class 1');
+            hold on;
+            line([optimum_classifier_th optimum_classifier_th],[0 1],...
+                 'color',([255 127 14]./255),'LineWidth',2);
+            hold on;   
+            plot(pop(index).result(data.result==2),target_v(data.result==2),'.','color',([236 149 149]./255)); % Class 2     
+            hold on;
+            plot(pop(index).result(data.result==1),target_v(data.result==1),'.','color',([150 201 237]./255)); % Class 1          
+            title('After optimization...'); 
+            subplot(3,2,3);
+            plot(FPv,TPv,'color',([255 127 14]./255),'linewidth',2);
+            xlabel('FP');
+            ylabel('TP');
+            title('ROC (after LS)');
+            axis square;
+            subplot(3,2,4);
+            plot(FNv,TNv,'color',([255 127 14]./255),'linewidth',2);
+            xlabel('FN');
+            ylabel('TN');
+            title('ROC');
+            axis square;
+            drawnow;
+         end
+         if verbose
+            fprintf('--------------------------------------------------------\n');
+            if AUC_full
+               fprintf(['AUCf before optimization = ' num2str(AUCf_ori) '\n']);      
+               fprintf(['AUCf after optimization = ' num2str(AUCf_opt) '\n']);      
+            else
+               fprintf(['AUCp before optimization = ' num2str(AUCp_ori) '\n']);      
+               fprintf(['AUCp after optimization = ' num2str(AUCp_opt) '\n']);      
+            end
+            fprintf(['ACC before optimization = ' num2str(ACC1) '\n']);
+            fprintf(['ACC after optimization = ' num2str(ACC2) '\n']); 
+            fprintf(['TP before optimization = ' num2str(TP) '/' num2str(sum(data.result == 1)) '\n']); 
+            fprintf(['TP after optimization = ' num2str(TP_opt) '/' num2str(sum(data.result == 1)) '\n']); 
+            fprintf(['TN before optimization = ' num2str(TN) '/' num2str(sum(data.result == 2)) '\n']); 
+            fprintf(['TN after optimization = ' num2str(TN_opt) '/' num2str(sum(data.result == 2)) '\n']);       
+         end
+      else
+         if params.usetestdata % Regression stage
+            testindividual=calcfitness(state.bestsofar,params,data.test,state,1); % (1 = test data)   
+            state.bestsofar.testfitness=testindividual.fitness;
+         end
       end
    end
-%    if params.usetestdata
-%       testindividual=calcfitness(state.bestsofar,params,data.test,state,1); % (1 = test data)   
-%       state.bestsofar.testfitness=testindividual.fitness;
-%    end
 catch
    output.funcCount = 1;
    output.iterations = 1;
@@ -388,8 +396,10 @@ if params.stop_by_funceval
                if ~isempty(state.bestsofar.fitness)
                   history_stats(index_v,2) = state.bestsofar.fitness;
                end
-               if ~isempty(state.bestsofar.testfitness)
-                  history_stats(index_v,3) = state.bestsofar.testfitness;
+               if params.usetestdata
+                  if ~isempty(state.bestsofar.testfitness)
+                     history_stats(index_v,3) = state.bestsofar.testfitness;
+                  end
                end
                if ~isempty(state.bestsofar.AUCf_opt)
                   history_stats(index_v,4) = state.bestsofar.AUCf_opt;
