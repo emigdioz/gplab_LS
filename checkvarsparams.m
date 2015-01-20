@@ -292,6 +292,9 @@ if start
       params.funceval_nsamples = 100;
    end
    
+   if(isfield(params,'LStype')==0)
+      params.LStype = 'regression';
+   end
 end % if start
 
 if continuing
