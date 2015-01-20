@@ -94,6 +94,7 @@ if vars.params.stop_by_funceval
    fprintf('\nUsing stop criteria by number of function evaluations\n');
    span_sample = vars.params.funceval_limit/vars.params.funceval_nsamples;   
    vector_sampling = 1:span_sample:vars.params.funceval_limit;
+   vector_sampling(end+1) = vars.params.funceval_limit;
    history_stats = zeros(length(vector_sampling),6);
    history_stats(:,1) = vector_sampling';
    funcEvalC = 0;
@@ -287,7 +288,58 @@ else
 end
 
 best=vars.state.bestsofar;
-best.history_stats = history_stats;
+
+%% Clean up history stats matrix
+if vars.params.stop_by_funceval
+   history_stats(end,:) = history_stats(end-1,:); % Last row is repeated from last values
+   length_history = size(history_stats,1);
+   for i=1:length_history % Check every zero and replace for last value greater than zero
+      if history_stats(i,2) == 0
+         begin_zeros = i;
+         while (history_stats(i,2) == 0) && (i < length_history)
+            i = i + 1;
+         end
+         history_stats(begin_zeros:i-1,2) = history_stats(i,2);
+      end
+   end
+   for i=1:length_history % Check every zero and replace for last value greater than zero
+      if history_stats(i,3) == 0
+         begin_zeros = i;
+         while (history_stats(i,3) == 0) && (i < length_history)
+            i = i + 1;
+         end
+         history_stats(begin_zeros:i-1,3) = history_stats(i,3);
+      end
+   end
+   for i=1:length_history % Check every zero and replace for last value greater than zero
+      if history_stats(i,4) == 0
+         begin_zeros = i;
+         while (history_stats(i,4) == 0) && (i < length_history)
+            i = i + 1;
+         end
+         history_stats(begin_zeros:i-1,4) = history_stats(i,4);
+      end
+   end
+   for i=1:length_history % Check every zero and replace for last value greater than zero
+      if history_stats(i,5) == 0
+         begin_zeros = i;
+         while (history_stats(i,5) == 0) && (i < length_history)
+            i = i + 1;
+         end
+         history_stats(begin_zeros:i-1,5) = history_stats(i,5);
+      end
+   end
+   for i=1:length_history % Check every zero and replace for last value greater than zero
+      if history_stats(i,6) == 0
+         begin_zeros = i;
+         while (history_stats(i,6) == 0) && (i < length_history)
+            i = i + 1;
+         end
+         history_stats(begin_zeros:i-1,6) = history_stats(i,6);
+      end
+   end   
+   best.history_stats = history_stats;
+end
 vars.state.keepevals=[]; % clear memory, we don't want to save all this!
 
 fprintf('\nDone!\n\n');
