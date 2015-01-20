@@ -30,6 +30,9 @@ global strEval;
 global span_interval;
 global optimum_classifier_th;
 global type_function;
+global funcEvalC; % Global counter for function evaluations tracking
+global vector_sampling; % Global sampling vector for function evaluations
+global history_stats; % Global vector for fitness history when using function evaluations
 
 
 original_fitness = pop(index).fitness; % Record original fitness
@@ -372,3 +375,34 @@ catch
    output.iterations = 1;
    fprintf(['        ' char(187) 'Individual %d fitness is too big -> Inf\n'],index);
 end
+
+%% Now begins function evaluations checking
+if params.stop_by_funceval
+   for i=1:(output.funcCount+output.iterations)      
+      funcEvalC = funcEvalC + 1;
+      if funcEvalC < vector_sampling(end)
+         if ~isempty(find(vector_sampling==funcEvalC))
+            index_v = find(vector_sampling==funcEvalC);
+            % Output statistics
+            if ~isempty(state.bestsofar)
+               if ~isempty(state.bestsofar.fitness)
+                  history_stats(index_v,2) = state.bestsofar.fitness;
+               end
+               if ~isempty(state.bestsofar.testfitness)
+                  history_stats(index_v,3) = state.bestsofar.testfitness;
+               end
+               if ~isempty(state.bestsofar.AUCf_opt)
+                  history_stats(index_v,4) = state.bestsofar.AUCf_opt;
+               end
+               if ~isempty(state.bestsofar.nodes)          
+                  history_stats(index_v,5) = state.bestsofar.nodes;
+               end
+               if state.generation > 0
+                  history_stats(index_v,6) = state.avgnodeshistory(state.generation);   
+               end
+            end
+         end
+      end
+   end
+end
+
