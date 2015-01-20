@@ -141,33 +141,7 @@ if params.useLS
                pop(bestindex)=addsymtree(params,pop(bestindex));
            end
        end
-%       c_param=cell(2,1);
-%       c_param=gettreeparams(pop(bestindex).tree,c_param,'tree',0,1); 
-%       nparams=size(c_param);
-%       %Obtain number of parameters carried by individual.
-%       x0=zeros(nparams(2),1);
-%       %Generate parameter matrix
-%       fprintf('Parameters before: [');
-%       for k=1:nparams(2)
-%           x0(k)=c_param{1,1}(1,k);  %Fill matrix with parameter values
-%           fprintf(num2str(x0(k)));
-%           fprintf(',');
-%       end      
-%       fprintf(']\n');
       [state,pop] = treeLS(params,state,data,pop,bestindex,'classification');
-%       c_param=gettreeparams(pop(bestindex).tree,c_param,'tree',0,1); 
-%       nparams=size(c_param);
-%       %Obtain number of parameters carried by individual.
-%       x0=zeros(nparams(2),1);
-%       %Generate parameter matrix
-%       fprintf('Parameters after: [');
-%       for k=1:nparams(2)
-%           x0(k)=c_param{1,1}(1,k);  %Fill matrix with parameter values
-%           fprintf(num2str(x0(k)));
-%           fprintf(',');
-%       end      
-%       fprintf(']\n');
-      
       state.bestsofar = pop(bestindex);
       ind_counter = ind_counter + 1;
    elseif params.LSworst
@@ -255,11 +229,8 @@ if params.usetestdata
    testindividual=calcfitness(state.bestsofar,params,data.test,state,1); % (1 = test data)
    state.bestsofar.testfitness=testindividual.fitness;
    state.bestsofar.testadjustedfitness=testindividual.adjustedfitness;
-%    state.bestsofar.ACC_ori=testindividual.ACC_ori;
-%    state.bestsofar.ACC_opt=testindividual.ACC_opt;
-%    state.bestsofar.AUCf_ori = testindividual.AUCf_ori;
-%    state.bestsofar.AUCf_opt = testindividual.AUCf_opt;
-   state.bestfithistory(end+1,:)=[state.bestsofar.fitness state.bestsofar.testfitness];
+   state.bestsofar.AUCf_opt = calcAUCf(state.bestsofar,params,data,state,1);
+   state.bestfithistory(end+1,:)=[state.bestsofar.fitness state.bestsofar.testfitness state.bestsofar.AUCf_opt];
    %state.history_extra(end+1,:) = [testindividual.ACC_ori testindividual.ACC_opt testindividual.AUCf_ori testindividual.AUCf_opt];
 else   
    state.bestfithistory(end+1)=state.bestsofar.fitness;
