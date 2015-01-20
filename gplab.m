@@ -35,6 +35,9 @@ function [vars,best,bloat,overfit]=gplab(g,varargin)
 %
 %   Copyright (C) 2003-2007 Sara Silva (sara@dei.uc.pt)
 %   This file is part of the GPLAB Toolbox
+global funcEvalC; % Global counter for function evaluations tracking
+global vector_sampling; % Global sampling vector for function evaluations
+global history_stats; % Global vector for fitness history when using function evaluations
 
 if (nargin<2) || (nargin>3)
    error('GPLAB: Wrong number of input arguments. Use either gplab(ngens,vars) to continue a run, or gplab(ngens,popsize,[optional params]) to start a run')   
@@ -85,6 +88,16 @@ vars.params=checkvarsparams(start,continuing,vars.params,n);
 
 % initialize random number generator (see help on RAND):
 rand('state',sum(100*clock));
+
+%% Construct sampling vector in case of function evaluations stop criteria
+if vars.params.stop_by_funceval
+   fprintf('\nUsing stop criteria by number of function evaluations\n');
+   span_sample = vars.params.funceval_limit/vars.params.funceval_nsamples;   
+   vector_sampling = 1:span_sample:vars.params.funceval_limit;
+   history_stats = zeros(length(vector_sampling),6);
+   history_stats(:,1) = vector_sampling';
+   funcEvalC = 0;
+end
 
 %%
 %construct symbolic tree:
@@ -164,15 +177,20 @@ complexity2=[];
 for i=ginic:gend
    
    % stop condition?
-   sc=stopcondition(vars.params,vars.state,vars.data);
-   if sc
-      % unless the option is to never save, save the algorithm variables now:
-      if (~strcmp(vars.params.savetofile,'never'))
-         saveall(vars);
+   if vars.params.stop_by_funceval
+      if funcEvalC > vector_sampling(end)
+         break; %stop condition
       end
-      break % if a stop condition has been reached, skip the for cycle
+   else
+      sc=stopcondition(vars.params,vars.state,vars.data);
+      if sc
+         % unless the option is to never save, save the algorithm variables now:
+         if (~strcmp(vars.params.savetofile,'never'))
+            saveall(vars);
+         end
+         break % if a stop condition has been reached, skip the for cycle
+      end
    end
-   
    % new generation:
    [vars.pop,vars.state]=generation(vars.pop,vars.params,vars.state,vars.data);
    
@@ -241,7 +259,9 @@ for i=ginic:gend
       fprintf('     Depth:         %d\n',vars.state.bestsofar.level);
       fprintf('     Nodes:         %d\n\n',vars.state.bestsofar.nodes);
    end
-   
+   if vars.params.stop_by_funceval
+      fprintf('     Number of function evaluations so far:   %d\n',funcEvalC);
+   end
    % plots:
    if ~isempty(vars.params.graphics)
       gfxState=graphicsgenerations(vars.params,vars.state,gfxState);
@@ -252,17 +272,22 @@ end % for i=ginic:gend
 
 % messages regarding the stop condition reached:
 
-if sc
-   if vars.state.generation==0
-      fprintf('\nStop condition #%d was reached after initial generation.\n',sc);      
-   else
-      fprintf('\nStop condition #%d was reached after generation %d.\n',sc,vars.state.generation);
-   end
+if vars.params.stop_by_funceval
+   fprintf(['\n' num2str(vector_sampling(end)) ' function evaluations have been done. Stopping run. ' num2str(vars.state.generation) ' generations\n']);
 else
-   fprintf('\nMaximum generation %d was reached.\n',vars.state.generation);
-end      
+   if sc
+      if vars.state.generation==0
+         fprintf('\nStop condition #%d was reached after initial generation.\n',sc);      
+      else
+         fprintf('\nStop condition #%d was reached after generation %d.\n',sc,vars.state.generation);
+      end
+   else
+      fprintf('\nMaximum generation %d was reached.\n',vars.state.generation);
+   end      
+end
 
 best=vars.state.bestsofar;
+best.history_stats = history_stats;
 vars.state.keepevals=[]; % clear memory, we don't want to save all this!
 
 fprintf('\nDone!\n\n');
