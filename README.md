@@ -45,6 +45,16 @@ New parameters:
 
 `cpath = pwd` loads the train,test files from current path
 
+`LSniter = x` x number of iterations used in optimization algorithm
+
+`stop_by_funceval = 0` if stop condition is original GPLAB method. `stop_by_funceval = 1` if uses number of function evaluations sampling instead of generations
+
+`funceval_limit = x` x function evaluations calls if above is on
+
+`funceval_nsamples = x` x number of samples for history stats matrix. Use a higher value if you require a high resolution sampling
+
+`LStype = 'regression'` if the problem to be solved is of the form symbolic regression. `LStype = 'classification'` if the problem is a classification problem. The logic involved for each one is different in the local search process
+
 
 Matlab is a product of MathWorks.
 
