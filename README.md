@@ -3,7 +3,7 @@ gplab_LS
 
 Introduction
 ------------
-General implementation of local search over GPLAB focusing in symbolic regression and classification. This also is an improved GPLAB implementation. Focused on speed and new features.
+General implementation of local search over GPLAB focusing in symbolic regression and classification. This is also an improved GPLAB implementation. Focused on speed and new features.
 
 GPLAB is a [matlab][mt] genetic programming toolbox. Developed by Sara Silva and collaborators. Original implementation can be found in `gplab repository` http://gplab.sourceforge.net/
 
