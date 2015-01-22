@@ -33,18 +33,18 @@ GPLAB parameters:
 
 | Name | Type | Default | Description |
 |:-----|:----:|:-------:|-------------|
-| useLS | Bool | 0 | 1 if use LS algorithm. 0 if use regular GPLAB |
-| LSbest | Bool | 1 | 1 if apply only to best individual per generation |
-| LSworst | Bool | 0 | 1 if apply only to worst individual per generation |
-| LSprob | Real | 1 | [0~1] Probability to apply LS to the selected subpopulation |
-| LSasc | Bool | 1 | 1 if subpopulation belongs to the best individuals. 0 for the worst individuals |
-| LSheuristic | Bool | 0 | 1 if a proportional population criterion is used to apply LS |
-| cpath | String | pwd | Loads the train, test files from current path |
-| LSniter | Integer | 400 | Number of iterations used in optimization algorithm |
-| stop_by_funceval | Bool | 0 | 1 if uses number of function evaluations sampling instead of generations |
-| funceval_limit | Integer | 1000000 | Function evaluation calls until evolution stops, if above is on |
-| funceval_nsamples | Integer | 100 | Number of samples for history stats matrix |
-| LStype | String | regression | If the problem to be solved is of the form symbolic regression. 'classification' if the problem is a classification problem. The logic involved for each one is different in the local search process |
+| `useLS` | Bool | 0 | 1 if use LS algorithm. 0 if use regular GPLAB |
+| `LSbest` | Bool | 1 | 1 if apply only to best individual per generation |
+| `LSworst` | Bool | 0 | 1 if apply only to worst individual per generation |
+| `LSprob` | Real | 1 | [0~1] Probability to apply LS to the selected subpopulation |
+| `LSasc` | Bool | 1 | 1 if subpopulation belongs to the best individuals. 0 for the worst individuals |
+| `LSheuristic` | Bool | 0 | 1 if a proportional population criterion is used to apply LS |
+| `cpath` | String | `pwd` | Loads the train, test files from current path |
+| `LSniter` | Integer | 400 | Number of iterations used in optimization algorithm |
+| `stop_by_funceval` | Bool | 0 | 1 if uses number of function evaluations sampling instead of generations |
+| `funceval_limit` | Integer | 1000000 | Function evaluation calls until evolution stops, if above is on |
+| `funceval_nsamples` | Integer | 100 | Number of samples for history stats matrix |
+| `LStype` | String | `regression` | If the problem to be solved is of the form symbolic regression. `classification` if the problem is a classification problem. The logic involved for each one is different in the local search process |
 
 **Matlab is a product of MathWorks.**
 
