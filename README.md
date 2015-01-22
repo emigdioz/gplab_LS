@@ -56,6 +56,6 @@ New parameters:
 `LStype = 'regression'` if the problem to be solved is of the form symbolic regression. `LStype = 'classification'` if the problem is a classification problem. The logic involved for each one is different in the local search process
 
 
-Matlab is a product of MathWorks.
+**Matlab is a product of MathWorks.**
 
 [mt]: http://www.mathworks.com/products/matlab/
