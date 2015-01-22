@@ -29,32 +29,22 @@ Just add gplab_LS to matlab paths and use it!
 How to
 ------
 
-New parameters:
+GPLAB parameters:
 
-- `useLS = 1` if use function set with parameters, `useLS = 0` regular GPLAB.
-
-- `LSbest = 1` 1 if apply only to best individual per generation
-
-- `LSworst = 1` 1 if apply only to worst individual per generation
-
-- `LSprob = x` x probability to apply LS to the selected subpopulation (float number from 0 to 1)
-
-- `LSasc = 1` if subpopulation belongs to the best individuals, `LSasc = 0` worst individuals
-
-- `LSheuristic = 1` if a proportional population size criterion is used. `LSheuristic = 0` for not using it
-
-- `cpath = pwd` loads the train,test files from current path
-
-- `LSniter = x` x number of iterations used in optimization algorithm
-
-- `stop_by_funceval = 0` if stop condition is original GPLAB method. `stop_by_funceval = 1` if uses number of function evaluations sampling instead of generations
-
-- `funceval_limit = x` x function evaluations calls if above is on
-
-- `funceval_nsamples = x` x number of samples for history stats matrix. Use a higher value if you require a high resolution sampling
-
-- `LStype = 'regression'` if the problem to be solved is of the form symbolic regression. `LStype = 'classification'` if the problem is a classification problem. The logic involved for each one is different in the local search process
-
+| Name | Type | Default | Description |
+|:-----|:----:|:-------:|-------------|
+| useLS | Bool | 0 | 1 if use LS algorithm. 0 if use regular GPLAB |
+| LSbest | Bool | 1 | 1 if apply only to best individual per generation |
+| LSworst | Bool | 0 | 1 if apply only to worst individual per generation |
+| LSprob | Real | 1 | [0~1] Probability to apply LS to the selected subpopulation |
+| LSasc | Bool | 1 | 1 if subpopulation belongs to the best individuals. 0 for the worst individuals |
+| LSheuristic | Bool | 0 | 1 if a proportional population criterion is used to apply LS |
+| cpath | String | pwd | Loads the train, test files from current path |
+| LSniter | Integer | 400 | Number of iterations used in optimization algorithm |
+| stop_by_funceval | Bool | 0 | 1 if uses number of function evaluations sampling instead of generations |
+| funceval_limit | Integer | 1000000 | Function evaluation calls until evolution stops, if above is on |
+| funceval_nsamples | Integer | 100 | Number of samples for history stats matrix |
+| LStype | String | regression | If the problem to be solved is of the form symbolic regression. 'classification' if the problem is a classification problem. The logic involved for each one is different in the local search process |
 
 **Matlab is a product of MathWorks.**
 
