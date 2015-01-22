@@ -7,7 +7,7 @@ General implementation of local search over GPLAB focusing in symbolic regressio
 
 GPLAB is a [matlab][mt] genetic programming toolbox. Developed by Sara Silva and collaborators. Original implementation can be found in `gplab repository` http://gplab.sourceforge.net/
 
-The goal is to enrich the original gplab with the findings of our group. Some detailed information of our group can be found in http://www.tree-lab.org ![alt text](http://www.tree-lab.org/images/logo/logo_treelab_v2_corner.png "Tree-Lab")
+The goal is to enrich the original gplab with the findings of our group. Some detailed information of our group can be found in http://www.tree-lab.org
 
 Tested in Matlab 8.1 (2013a) 64bits (Linux & Windows)
 
