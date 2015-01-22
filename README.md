@@ -31,29 +31,29 @@ How to
 
 New parameters:
 
-`useLS = 1` if use function set with parameters, `useLS = 0` regular GPLAB.
+- `useLS = 1` if use function set with parameters, `useLS = 0` regular GPLAB.
 
-`LSbest = 1` 1 if apply only to best individual per generation
+- `LSbest = 1` 1 if apply only to best individual per generation
 
-`LSworst = 1` 1 if apply only to worst individual per generation
+- `LSworst = 1` 1 if apply only to worst individual per generation
 
-`LSprob = x` x probability to apply LS to the selected subpopulation (float number from 0 to 1)
+- `LSprob = x` x probability to apply LS to the selected subpopulation (float number from 0 to 1)
 
-`LSasc = 1` if subpopulation belongs to the best individuals, `LSasc = 0` worst individuals
+- `LSasc = 1` if subpopulation belongs to the best individuals, `LSasc = 0` worst individuals
 
-`LSheuristic = 1` if a proportional population size criterion is used. `LSheuristic = 0` for not using it
+- `LSheuristic = 1` if a proportional population size criterion is used. `LSheuristic = 0` for not using it
 
-`cpath = pwd` loads the train,test files from current path
+- `cpath = pwd` loads the train,test files from current path
 
-`LSniter = x` x number of iterations used in optimization algorithm
+- `LSniter = x` x number of iterations used in optimization algorithm
 
-`stop_by_funceval = 0` if stop condition is original GPLAB method. `stop_by_funceval = 1` if uses number of function evaluations sampling instead of generations
+- `stop_by_funceval = 0` if stop condition is original GPLAB method. `stop_by_funceval = 1` if uses number of function evaluations sampling instead of generations
 
-`funceval_limit = x` x function evaluations calls if above is on
+- `funceval_limit = x` x function evaluations calls if above is on
 
-`funceval_nsamples = x` x number of samples for history stats matrix. Use a higher value if you require a high resolution sampling
+- `funceval_nsamples = x` x number of samples for history stats matrix. Use a higher value if you require a high resolution sampling
 
-`LStype = 'regression'` if the problem to be solved is of the form symbolic regression. `LStype = 'classification'` if the problem is a classification problem. The logic involved for each one is different in the local search process
+- `LStype = 'regression'` if the problem to be solved is of the form symbolic regression. `LStype = 'classification'` if the problem is a classification problem. The logic involved for each one is different in the local search process
 
 
 **Matlab is a product of MathWorks.**
