@@ -57,6 +57,9 @@ if type_function==2 % Classification stage
    [min_th, min_I] = min(res); % Minimum threshold
    [max_th, max_I] = max(res); % Maximum threshold
 
+   if(min_th==max_th) % Avoid doing any calculation when vector is the same
+      return;
+   end
    if AUC_full
       % Calculate full AUC
       s_data = length(res);
