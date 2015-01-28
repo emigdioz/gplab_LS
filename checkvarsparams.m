@@ -280,6 +280,10 @@ if start
       params.LSprob = 1;
    end
 
+   if(isfield(params,'LSmaxind')==0)
+      params.LSmaxind = 1;
+   end
+   
    if(isfield(params,'stop_by_funceval')==0)
       params.stop_by_funceval = 0;
    end
