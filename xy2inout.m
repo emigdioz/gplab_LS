@@ -29,7 +29,7 @@ if nx==ny % if dimensions match
    xy=[x y];
    
    % apply uniquenosort (see function for details):
-   xy=uniquenosort(xy);
+   %xy=uniquenosort(xy);
       
    % now separate x and y again:
    d=size(x,2);
