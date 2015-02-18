@@ -228,6 +228,8 @@ x0=zeros(nparams(2),1);
 for k=1:nparams(2)
     x0(k)=c_param{1,1}(1,k);  %Fill matrix with parameter values
 end
+% Update parameter array
+pop(index).parameters = x0; % If not changed after, it keeps updated anyway
 
 niter = params.LSniter;
 %niter = 1000;
