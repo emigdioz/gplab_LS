@@ -219,7 +219,7 @@ if params.useLS
    end
    fprintf('\n/    Finished LS on %d individuals\n',ind_counter);
    state.bestsofar = pop(bestindex);
-   state.bestsofar.parameters = pop(bestindex).parameters;   
+   %state.bestsofar.parameters = pop(bestindex).parameters;   
 end
 
 %fprintf(['After optimization fitness: ' num2str(pop(bestindex).fitness) '\n']);
