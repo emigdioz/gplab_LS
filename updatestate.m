@@ -230,9 +230,13 @@ if params.usetestdata
    testindividual=calcfitness(state.bestsofar,params,data.test,state,1); % (1 = test data)
    state.bestsofar.testfitness=testindividual.fitness;
    state.bestsofar.testadjustedfitness=testindividual.adjustedfitness;
-   state.bestsofar.AUCf_opt = calcAUCf(state.bestsofar,params,data,state,1);
-   state.bestfithistory(end+1,:)=[state.bestsofar.fitness state.bestsofar.testfitness state.bestsofar.AUCf_opt];
-   %state.history_extra(end+1,:) = [testindividual.ACC_ori testindividual.ACC_opt testindividual.AUCf_ori testindividual.AUCf_opt];
+   if strcmp(params.LStype,'classification')
+      state.bestsofar.AUCf_opt = calcAUCf(state.bestsofar,params,data,state,1);
+      state.bestfithistory(end+1,:) = [state.bestsofar.fitness state.bestsofar.testfitness state.bestsofar.AUCf_opt];
+      state.history_extra(end+1,:) = [testindividual.ACC_ori testindividual.ACC_opt testindividual.AUCf_ori testindividual.AUCf_opt];
+   else
+      state.bestfithistory(end+1,:) = [state.bestsofar.fitness state.bestsofar.testfitness];
+   end      
 else   
    state.bestfithistory(end+1)=state.bestsofar.fitness;
 end
