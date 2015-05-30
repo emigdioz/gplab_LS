@@ -76,6 +76,7 @@ if length(res)<length(data.result)
 end
 
 sumdif=mean((res-data.result).^2);
+%sumdif=mean(abs(res-data.result));
 
 ind.result=res;
 
