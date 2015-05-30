@@ -74,3 +74,4 @@ ind.AUCf_opt = [];
 ind.optimum_classifier_th = [];
 ind.span_interval = [];
 ind.parameters = [];
+ind.opt_iterations = [];
