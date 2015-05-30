@@ -132,3 +132,7 @@ if strcmp(params.output,'verbose')
    state
    fprintf('\n');   
 end
+
+% Initilize matrix for optimization purposes
+state.pop_opt_fitness = zeros(state.popsize,state.maxgen,2);
+state.pop_opt_iter = zeros(state.popsize,state.maxgen,2);
