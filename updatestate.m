@@ -166,7 +166,17 @@ if params.useLS
                   end
                end
                if (min(pop(i).result) ~= max(pop(i).result))
-                  [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
+                  % Make double optimization for comparison only
+                  if (params.enable_param_heritage_comp) && (state.generation > 0)                    
+                     [state,pop] = treeLS(params,state,data,pop,i,params.LStype,0);
+                     state.pop_opt_fitness(i,state.generation,1) = pop(i).fitness; 
+                     state.pop_opt_iter(i,state.generation,1) = pop(i).opt_iterations;
+                     [state,pop] = treeLS(params,state,data,pop,i,params.LStype,1);
+                     state.pop_opt_fitness(i,state.generation,2) = pop(i).fitness;
+                     state.pop_opt_iter(i,state.generation,2) = pop(i).opt_iterations;
+                  else
+                     [state,pop] = treeLS(params,state,data,pop,i,params.LStype,0);
+                  end
                %[state,pop] = applyLS(params,state,data,pop,i);
                   ind_counter = ind_counter + 1;
                end
@@ -181,7 +191,16 @@ if params.useLS
                      end
                   end
                   if (min(pop(i).result) ~= max(pop(i).result))
-                     [state,pop] = treeLS(params,state,data,pop,i,params.LStype);
+                     if (params.enable_param_heritage_comp) && (state.generation > 0)                    
+                        [state,pop] = treeLS(params,state,data,pop,i,params.LStype,0);
+                        state.pop_opt_fitness(i,state.generation,1) = pop(i).fitness;  
+                        state.pop_opt_iter(i,state.generation,1) = pop(i).opt_iterations;  
+                        [state,pop] = treeLS(params,state,data,pop,i,params.LStype,1);
+                        state.pop_opt_fitness(i,state.generation,2) = pop(i).fitness;
+                        state.pop_opt_iter(i,state.generation,2) = pop(i).opt_iterations;  
+                     else
+                        [state,pop] = treeLS(params,state,data,pop,i,params.LStype,0);
+                     end
                      %[state,pop] = applyLS(params,state,data,pop,i);
                      ind_counter = ind_counter + 1;
                   end
