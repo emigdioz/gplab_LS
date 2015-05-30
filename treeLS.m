@@ -1,4 +1,4 @@
-function [state,pop] = treeLS(params,state,data,pop,index,type)
+function [state,pop] = treeLS(params,state,data,pop,index,type,unity)
 %TREELS    Optimizes a parametrized tree by means of non-linear method.
 %          In this case uses the Trust Region method.
 %   TREELS(TREE) returns the string and the optimized parameters
@@ -207,7 +207,7 @@ if type_function==2 % Classification stage
       title('Before optimization...');
    end
 end
-if type_function==1 % Regression stage
+if type_function == 1 % Regression stage
    target_v = data.result;   
 end
 % Important! save optimum_classifier_th & span_interval to reuse in fitness
@@ -229,11 +229,17 @@ for k=1:nparams(2)
     x0(k)=c_param{1,1}(1,k);  %Fill matrix with parameter values
 end
 % Update parameter array
+if params.enable_param_heritage_comp
+   if unity
+      x0(:) = 1;
+   end
+end   
+
 pop(index).parameters = x0; % If not changed after, it keeps updated anyway
 
 niter = params.LSniter;
 %niter = 1000;
-options = optimset('Display','off','MaxIter',niter);
+options = optimset('Display','off','MaxIter',niter,'MaxFunEvals',nparams(2)*200);
 
 %lb = [-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000];
 %ub = [1000,1000,1000,1000,1000,1000,1000,1000,1000,1000];
@@ -267,6 +273,7 @@ try
       pop(index).result = individual_m.result;
       pop(index).tree = temp_ind.tree;
       pop(index).parameters = temp_ind.parameters;
+      pop(index).opt_iterations = output.iterations;
       
       if type_function==2 % Classification stage
          sig_f_opt = 1./(1+exp((15./span_interval).*(pop(index).result-optimum_classifier_th)));
@@ -387,6 +394,7 @@ try
 catch
    output.funcCount = 1;
    output.iterations = 1;
+   pop(index).opt_iterations = 1;
    fprintf(['        ' char(187) 'Individual %d fitness is too big -> Inf\n'],index);
 end
 
