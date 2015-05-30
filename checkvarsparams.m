@@ -295,9 +295,13 @@ if start
    if(isfield(params,'funceval_nsamples')==0)
       params.funceval_nsamples = 100;
    end
-   
+
    if(isfield(params,'LStype')==0)
       params.LStype = 'regression';
+   end
+   
+   if(isfield(params,'enable_param_heritage_comp')==0)
+      params.enable_param_heritage_comp = false;
    end
 end % if start
 
